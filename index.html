@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Conta Hospitalar JAVA TREINAMENTOS - IP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.05);
+        }
+        .bill-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .bill-total {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 2px solid #3498db;
+        }
+        .warning {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .item-list {
+            margin-left: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: #ddd;
+            margin-right: 5px;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .add-item-btn {
+            background: #27ae60;
+            margin-top: 10px;
+        }
+        .remove-item-btn {
+            background: #e74c3c;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simulador de Conta Hospitalar JAVA TREINAMENTOS - IP</h1>
+        <p>Este aplicativo simula o cálculo de uma conta de internação hospitalar de até 4 dias.</p>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="openTab('tab1')">Dados Básicos</div>
+            <div class="tab" onclick="openTab('tab2')">Procedimentos</div>
+            <div class="tab" onclick="openTab('tab3')">Materiais</div>
+            <div class="tab" onclick="openTab('tab4')">Medicamentos</div>
+        </div>
+        
+        <form id="hospitalBillForm">
+            <div id="tab1" class="tab-content active">
+                <div class="form-group">
+                    <label for="admissionDate">Data e Hora de Admissão:</label>
+                    <input type="datetime-local" id="admissionDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dischargeDate">Data e Hora de Alta:</label>
+                    <input type="datetime-local" id="dischargeDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="accommodationType">Tipo de Acomodação:</label>
+                    <select id="accommodationType" required>
+                        <option value="">Selecione...</option>
+                        <option value="enfermaria">Enfermaria</option>
+                        <option value="apartamento">Apartamento</option>
+                        <option value="uti">UTI Adulto</option>
+                        <option value="uti_pediatrica">UTI Pediátrica</option>
+                        <option value="uti_neonatal">UTI Neonatal</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="diagnosis">Diagnóstico Principal (CID-10):</label>
+                    <input type="text" id="diagnosis" placeholder="Ex: J18.9" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dailyVisits">Visitas Médicas Diárias:</label>
+                    <input type="number" id="dailyVisits" min="0" max="10" value="1">
+                </div>
+            </div>
+            
+            <div id="tab2" class="tab-content">
+                <div id="proceduresContainer">
+                    <div class="procedure-item">
+                        <div class="form-group">
+                            <label for="procedure1">Procedimento:</label>
+                            <select id="procedure1" class="procedure-select">
+                                <option value="">Selecione um procedimento...</option>
+                                <option value="001">001 - Consulta inicial</option>
+                                <option value="002">002 - Cirurgia pequeno porte</option>
+                                <option value="003">003 - Cirurgia médio porte</option>
+                                <option value="004">004 - Cirurgia grande porte</option>
+                                <option value="005">005 - Raio-X simples</option>
+                                <option value="006">006 - Tomografia computadorizada</option>
+                                <option value="007">007 - Ultrassonografia</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" class="anesthesia"> Incluir anestesia
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" class="auxiliary"> Incluir auxiliares
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="add-item-btn" onclick="addProcedure()">Adicionar Procedimento</button>
+            </div>
+            
+            <div id="tab3" class="tab-content">
+                <div id="materialsContainer">
+                    <div class="material-item">
+                        <div class="form-group">
+                            <label for="material1">Material:</label>
+                            <select id="material1" class="material-select">
+                                <option value="">Selecione um material...</option>
+                                <option value="M001">M001 - Gaze estéril (pacote)</option>
+                                <option value="M002">M002 - Seringa descartável 10ml</option>
+                                <option value="M003">M003 - Agulha descartável</option>
+                                <option value="M004">M004 - Catéter IV</option>
+                                <option value="M005">M005 - Luvas cirúrgicas (par)</option>
+                                <option value="M006">M006 - Máscara cirúrgica</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="materialQty1">Quantidade:</label>
+                            <input type="number" id="materialQty1" class="material-qty" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" class="material-authorized"> Autorizado
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="add-item-btn" onclick="addMaterial()">Adicionar Material</button>
+            </div>
+            
+            <div id="tab4" class="tab-content">
+                <div id="medicationsContainer">
+                    <div class="medication-item">
+                        <div class="form-group">
+                            <label for="medication1">Medicamento:</label>
+                            <select id="medication1" class="medication-select">
+                                <option value="">Selecione um medicamento...</option>
+                                <option value="MED001">MED001 - Dipirona (ampola)</option>
+                                <option value="MED002">MED002 - Paracetamol (comprimido)</option>
+                                <option value="MED003">MED003 - Amoxicilina (comprimido)</option>
+                                <option value="MED004">MED004 - Soro fisiológico 0,9% (500ml)</option>
+                                <option value="MED005">MED005 - Glicose 5% (500ml)</option>
+                                <option value="MED006">MED006 - Insulina NPH (frasco)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="medicationQty1">Quantidade:</label>
+                            <input type="number" id="medicationQty1" class="medication-qty" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" class="medication-authorized"> Autorizado
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="add-item-btn" onclick="addMedication()">Adicionar Medicamento</button>
+            </div>
+            
+            <div class="form-group">
+                <button type="button" onclick="calculateBill()">Calcular Conta Hospitalar</button>
+            </div>
+        </form>
+        
+        <div id="resultSection" class="result-section hidden">
+            <h2>Conta Hospitalar Simulada</h2>
+            <div id="billDetails"></div>
+        </div>
+    </div>
+
+    <script>
+        // Dados simulados das tabelas IPASGO
+        const accommodationRates = {
+            enfermaria: 250.00,
+            apartamento: 450.00,
+            uti: 1200.00,
+            uti_pediatrica: 1300.00,
+            uti_neonatal: 1400.00
+        };
+        
+        const procedureRates = {
+            '001': { base: 150.00, anesthesia: 0, auxiliary: 0 },
+            '002': { base: 800.00, anesthesia: 300.00, auxiliary: 200.00 },
+            '003': { base: 1500.00, anesthesia: 500.00, auxiliary: 300.00 },
+            '004': { base: 2500.00, anesthesia: 800.00, auxiliary: 500.00 },
+            '005': { base: 120.00, anesthesia: 0, auxiliary: 0 },
+            '006': { base: 600.00, anesthesia: 0, auxiliary: 0 },
+            '007': { base: 200.00, anesthesia: 0, auxiliary: 0 }
+        };
+        
+        const materialRates = {
+            'M001': 15.00,
+            'M002': 2.50,
+            'M003': 1.80,
+            'M004': 8.00,
+            'M005': 4.50,
+            'M006': 3.00
+        };
+        
+        const medicationRates = {
+            'MED001': 5.00,
+            'MED002': 0.80,
+            'MED003': 2.50,
+            'MED004': 12.00,
+            'MED005': 10.00,
+            'MED006': 25.00
+        };
+        
+        const visitRate = 80.00; // Código TUSS 10102019 / IPASGO 00020010
+        
+        // Funções para gerenciar as abas
+        function openTab(tabId) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            const tabButtons = document.querySelectorAll('.tab');
+            tabButtons.forEach(button => button.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+        
+        // Funções para adicionar itens dinamicamente
+        let procedureCount = 1;
+        let materialCount = 1;
+        let medicationCount = 1;
+        
+        function addProcedure() {
+            procedureCount++;
+            const container = document.getElementById('proceduresContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'procedure-item';
+            newItem.innerHTML = `
+                <div class="form-group">
+                    <label for="procedure${procedureCount}">Procedimento:</label>
+                    <select id="procedure${procedureCount}" class="procedure-select">
+                        <option value="">Selecione um procedimento...</option>
+                        <option value="001">001 - Consulta inicial</option>
+                        <option value="002">002 - Cirurgia pequeno porte</option>
+                        <option value="003">003 - Cirurgia médio porte</option>
+                        <option value="004">004 - Cirurgia grande porte</option>
+                        <option value="005">005 - Raio-X simples</option>
+                        <option value="006">006 - Tomografia computadorizada</option>
+                        <option value="007">007 - Ultrassonografia</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" class="anesthesia"> Incluir anestesia
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" class="auxiliary"> Incluir auxiliares
+                    </label>
+                </div>
+                <button type="button" class="remove-item-btn" onclick="this.parentNode.remove()">Remover</button>
+            `;
+            container.appendChild(newItem);
+        }
+        
+        function addMaterial() {
+            materialCount++;
+            const container = document.getElementById('materialsContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'material-item';
+            newItem.innerHTML = `
+                <div class="form-group">
+                    <label for="material${materialCount}">Material:</label>
+                    <select id="material${materialCount}" class="material-select">
+                        <option value="">Selecione um material...</option>
+                        <option value="M001">M001 - Gaze estéril (pacote)</option>
+                        <option value="M002">M002 - Seringa descartável 10ml</option>
+                        <option value="M003">M003 - Agulha descartável</option>
+                        <option value="M004">M004 - Catéter IV</option>
+                        <option value="M005">M005 - Luvas cirúrgicas (par)</option>
+                        <option value="M006">M006 - Máscara cirúrgica</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="materialQty${materialCount}">Quantidade:</label>
+                    <input type="number" id="materialQty${materialCount}" class="material-qty" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" class="material-authorized" checked> Autorizado
+                    </label>
+                </div>
+                <button type="button" class="remove-item-btn" onclick="this.parentNode.remove()">Remover</button>
+            `;
+            container.appendChild(newItem);
+        }
+        
+        function addMedication() {
+            medicationCount++;
+            const container = document.getElementById('medicationsContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'medication-item';
+            newItem.innerHTML = `
+                <div class="form-group">
+                    <label for="medication${medicationCount}">Medicamento:</label>
+                    <select id="medication${medicationCount}" class="medication-select">
+                        <option value="">Selecione um medicamento...</option>
+                        <option value="MED001">MED001 - Dipirona (ampola)</option>
+                        <option value="MED002">MED002 - Paracetamol (comprimido)</option>
+                        <option value="MED003">MED003 - Amoxicilina (comprimido)</option>
+                        <option value="MED004">MED004 - Soro fisiológico 0,9% (500ml)</option>
+                        <option value="MED005">MED005 - Glicose 5% (500ml)</option>
+                        <option value="MED006">MED006 - Insulina NPH (frasco)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="medicationQty${medicationCount}">Quantidade:</label>
+                    <input type="number" id="medicationQty${medicationCount}" class="medication-qty" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" class="medication-authorized" checked> Autorizado
+                    </label>
+                </div>
+                <button type="button" class="remove-item-btn" onclick="this.parentNode.remove()">Remover</button>
+            `;
+            container.appendChild(newItem);
+        }
+        
+        // Função principal de cálculo
+        function calculateBill() {
+            // Obter dados básicos
+            const admissionDate = new Date(document.getElementById('admissionDate').value);
+            const dischargeDate = new Date(document.getElementById('dischargeDate').value);
+            const accommodationType = document.getElementById('accommodationType').value;
+            const diagnosis = document.getElementById('diagnosis').value;
+            const dailyVisits = parseInt(document.getElementById('dailyVisits').value);
+            
+            // Validar entrada
+            if (!admissionDate || !dischargeDate || !accommodationType || !diagnosis) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+            
+            if (dischargeDate <= admissionDate) {
+                alert('A data de alta deve ser posterior à data de admissão.');
+                return;
+            }
+            
+            // Calcular permanência (diárias)
+            const hoursDiff = Math.abs(dischargeDate - admissionDate) / 36e5;
+            let fullDays = Math.floor(hoursDiff / 24);
+            let remainingHours = hoursDiff % 24;
+            
+            // Regra de meia diária (se permanência < 24h ou horas restantes >= 6h)
+            let halfDay = false;
+            if (fullDays === 0 && hoursDiff < 24) {
+                halfDay = true;
+            } else if (remainingHours >= 6) {
+                fullDays++;
+                halfDay = true;
+            }
+            
+            // Limitar a 4 dias conforme especificado
+            if (fullDays > 4 || (fullDays === 4 && halfDay)) {
+                alert('Este simulador é limitado a no máximo 4 dias de internação.');
+                return;
+            }
+            
+            // Calcular custo das diárias
+            const dailyRate = accommodationRates[accommodationType];
+            let accommodationCost = fullDays * dailyRate;
+            if (halfDay) {
+                accommodationCost += dailyRate / 2;
+            }
+            
+            // Calcular custo dos procedimentos
+            let proceduresCost = 0;
+            let proceduresDetails = [];
+            const procedureItems = document.querySelectorAll('.procedure-item');
+            
+            procedureItems.forEach((item, index) => {
+                const procedureCode = item.querySelector('.procedure-select').value;
+                if (!procedureCode) return;
+                
+                const procedure = procedureRates[procedureCode];
+                const includeAnesthesia = item.querySelector('.anesthesia').checked;
+                const includeAuxiliary = item.querySelector('.auxiliary').checked;
+                
+                let itemCost = procedure.base;
+                if (includeAnesthesia) itemCost += procedure.anesthesia;
+                if (includeAuxiliary) itemCost += procedure.auxiliary;
+                
+                proceduresCost += itemCost;
+                
+                proceduresDetails.push({
+                    code: procedureCode,
+                    description: item.querySelector('.procedure-select').options[item.querySelector('.procedure-select').selectedIndex].text,
+                    base: procedure.base,
+                    anesthesia: includeAnesthesia ? procedure.anesthesia : 0,
+                    auxiliary: includeAuxiliary ? procedure.auxiliary : 0,
+                    total: itemCost
+                });
+            });
+            
+            // Calcular custo dos materiais
+            let materialsCost = 0;
+            let materialsDetails = [];
+            const materialItems = document.querySelectorAll('.material-item');
+            
+            materialItems.forEach((item, index) => {
+                const materialCode = item.querySelector('.material-select').value;
+                if (!materialCode) return;
+                
+                const quantity = parseInt(item.querySelector('.material-qty').value);
+                const authorized = item.querySelector('.material-authorized').checked;
+                const unitPrice = materialRates[materialCode];
+                let itemCost = unitPrice * quantity;
+                
+                if (!authorized) {
+                    itemCost = 0; // Considera como glosado
+                }
+                
+                materialsCost += itemCost;
+                
+                materialsDetails.push({
+                    code: materialCode,
+                    description: item.querySelector('.material-select').options[item.querySelector('.material-select').selectedIndex].text,
+                    quantity: quantity,
+                    unitPrice: unitPrice,
+                    authorized: authorized,
+                    total: itemCost
+                });
+            });
+            
+            // Calcular custo dos medicamentos
+            let medicationsCost = 0;
+            let medicationsDetails = [];
+            const medicationItems = document.querySelectorAll('.medication-item');
+            
+            medicationItems.forEach((item, index) => {
+                const medicationCode = item.querySelector('.medication-select').value;
+                if (!medicationCode) return;
+                
+                const quantity = parseInt(item.querySelector('.medication-qty').value);
+                const authorized = item.querySelector('.medication-authorized').checked;
+                const unitPrice = medicationRates[medicationCode];
+                let itemCost = unitPrice * quantity;
+                
+                if (!authorized) {
+                    itemCost = 0; // Considera como glosado
+                }
+                
+                medicationsCost += itemCost;
+                
+                medicationsDetails.push({
+                    code: medicationCode,
+                    description: item.querySelector('.medication-select').options[item.querySelector('.medication-select').selectedIndex].text,
+                    quantity: quantity,
+                    unitPrice: unitPrice,
+                    authorized: authorized,
+                    total: itemCost
+                });
+            });
+            
+            // Calcular custo das visitas médicas (opcional)
+            let visitsCost = 0;
+            if (dailyVisits > 0) {
+                // Considerando que cada dia tem pelo menos 1 visita
+                const visitDays = halfDay ? fullDays + 1 : fullDays;
+                visitsCost = visitDays * dailyVisits * visitRate;
+            }
+            
+            // Calcular total geral
+            const totalCost = accommodationCost + proceduresCost + materialsCost + medicationsCost + visitsCost;
+            
+            // Exibir resultados
+            displayResults({
+                admissionDate,
+                dischargeDate,
+                accommodationType,
+                diagnosis,
+                fullDays,
+                halfDay,
+                dailyRate,
+                accommodationCost,
+                proceduresDetails,
+                proceduresCost,
+                materialsDetails,
+                materialsCost,
+                medicationsDetails,
+                medicationsCost,
+                dailyVisits,
+                visitsCost,
+                totalCost
+            });
+        }
+        
+        // Função para exibir os resultados
+        function displayResults(data) {
+            const resultSection = document.getElementById('resultSection');
+            const billDetails = document.getElementById('billDetails');
+            
+            // Formatar datas
+            const formatDate = (date) => {
+                return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR');
+            };
+            
+            // Criar HTML dos resultados
+            let html = `
+                <h3>Dados da Internação</h3>
+                <div class="bill-item">
+                    <p><strong>Admissão:</strong> ${formatDate(data.admissionDate)}</p>
+                    <p><strong>Alta:</strong> ${formatDate(data.dischargeDate)}</p>
+                    <p><strong>Tipo de Acomodação:</strong> ${document.getElementById('accommodationType').options[document.getElementById('accommodationType').selectedIndex].text}</p>
+                    <p><strong>Diagnóstico Principal (CID-10):</strong> ${data.diagnosis}</p>
+                </div>
+                
+                <h3>Diárias</h3>
+                <div class="bill-item">
+                    <p>${data.fullDays} diária(s) completa(s) × R$ ${data.dailyRate.toFixed(2)} = R$ ${(data.fullDays * data.dailyRate).toFixed(2)}</p>
+                    ${data.halfDay ? `<p>+ 1 meia diária × R$ ${(data.dailyRate / 2).toFixed(2)} = R$ ${(data.dailyRate / 2).toFixed(2)}</p>` : ''}
+                    <p><strong>Total Diárias:</strong> R$ ${data.accommodationCost.toFixed(2)}</p>
+                </div>
+            `;
+            
+            if (data.proceduresDetails.length > 0) {
+                html += `
+                    <h3>Procedimentos</h3>
+                    <div class="bill-item">
+                        <div class="item-list">
+                `;
+                
+                data.proceduresDetails.forEach(item => {
+                    html += `
+                        <div class="bill-item">
+                            <p><strong>${item.code} - ${item.description}</strong></p>
+                            <p>Valor base: R$ ${item.base.toFixed(2)}</p>
+                            ${item.anesthesia > 0 ? `<p>+ Anestesia: R$ ${item.anesthesia.toFixed(2)}</p>` : ''}
+                            ${item.auxiliary > 0 ? `<p>+ Auxiliares: R$ ${item.auxiliary.toFixed(2)}</p>` : ''}
+                            <p><strong>Subtotal:</strong> R$ ${item.total.toFixed(2)}</p>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                        <p><strong>Total Procedimentos:</strong> R$ ${data.proceduresCost.toFixed(2)}</p>
+                    </div>
+                `;
+            }
+            
+            if (data.materialsDetails.length > 0) {
+                html += `
+                    <h3>Materiais</h3>
+                    <div class="bill-item">
+                        <div class="item-list">
+                `;
+                
+                data.materialsDetails.forEach(item => {
+                    html += `
+                        <div class="bill-item">
+                            <p><strong>${item.code} - ${item.description}</strong></p>
+                            <p>${item.quantity} × R$ ${item.unitPrice.toFixed(2)} = R$ ${(item.quantity * item.unitPrice).toFixed(2)}</p>
+                            ${!item.authorized ? `<p class="warning">Item não autorizado - valor glosado</p>` : ''}
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                        <p><strong>Total Materiais:</strong> R$ ${data.materialsCost.toFixed(2)}</p>
+                    </div>
+                `;
+            }
+            
+            if (data.medicationsDetails.length > 0) {
+                html += `
+                    <h3>Medicamentos</h3>
+                    <div class="bill-item">
+                        <div class="item-list">
+                `;
+                
+                data.medicationsDetails.forEach(item => {
+                    html += `
+                        <div class="bill-item">
+                            <p><strong>${item.code} - ${item.description}</strong></p>
+                            <p>${item.quantity} × R$ ${item.unitPrice.toFixed(2)} = R$ ${(item.quantity * item.unitPrice).toFixed(2)}</p>
+                            ${!item.authorized ? `<p class="warning">Item não autorizado - valor glosado</p>` : ''}
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                        <p><strong>Total Medicamentos:</strong> R$ ${data.medicationsCost.toFixed(2)}</p>
+                    </div>
+                `;
+            }
+            
+            if (data.dailyVisits > 0) {
+                html += `
+                    <h3>Visitas Médicas</h3>
+                    <div class="bill-item">
+                        <p>${data.dailyVisits} visita(s) por dia × ${data.halfDay ? data.fullDays + 1 : data.fullDays} dia(s) × R$ ${visitRate.toFixed(2)}</p>
+                        <p><strong>Total Visitas:</strong> R$ ${data.visitsCost.toFixed(2)}</p>
+                    </div>
+                `;
+            }
+            
+            html += `
+                <div class="bill-total">
+                    <p><strong>VALOR TOTAL DA CONTA HOSPITALAR:</strong> R$ ${data.totalCost.toFixed(2)}</p>
+                </div>
+                
+                <p><em>Esta é uma simulação educacional. Mais informações https://www.instagram.com/java.treinamentos/.</em></p>
+            `;
+            
+            billDetails.innerHTML = html;
+            resultSection.classList.remove('hidden');
+            
+            // Rolar para a seção de resultados
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
